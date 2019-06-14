@@ -3,7 +3,7 @@
 @section('content')
     <div class="row">
         <div class="col">
-            <h1>New Report</h1>
+            <h1>Send Report</h1>
         </div>
     </div>
     <div class="row">
@@ -22,13 +22,13 @@
                 </ul>
             </div>
             @endif
-            <form action="/expense-reports" method="post">
+            <form action="/expense-reports/{{ $report->id }}/sendMail" method="post">
                 @csrf
                 <div class="form-group">
-                    <label for="title">Title</label>
-                    <input type="text" name="title" id="title" class="form-control" placeholder="Type a title" value="{{old('title')}}">
+                    <label for="title">Email</label>
+                    <input type="text" name="email" id="email" class="form-control" placeholder="Type an email" value="{{old('email')}}">
                 </div>
-                <button class="btn btn-primary" type="submit"> Submit </button>
+                <button class="btn btn-primary" type="submit"> Send mail </button>
             </form>
         </div>
     </div>

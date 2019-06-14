@@ -3,10 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\ExpenseReport;
+use App\Mail\SummaryReport;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class ExpenseReportController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
     /**
      * Display a listing of the resource.
      *
@@ -38,11 +44,11 @@ class ExpenseReportController extends Controller
     public function store(Request $request)
     {
         $validData = $request->validate([
-            'title' => 'required'
+            'title' => 'required | min:3'
         ]);
 
         $report = new ExpenseReport();
-        $report->title = $request->get('title');
+        $report->title = $validData['title'];
         $report->save();
 
         return \redirect('/expense-reports');
@@ -54,9 +60,14 @@ class ExpenseReportController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    // public function show($id)
+    public function show(ExpenseReport $expenseReport)
     {
-        //
+        // $report = ExpenseReport::findOrFail($id);
+        return \view('expenseReport.show',[
+            // 'report' => $report,
+            'report' => $expenseReport,
+        ]);
     }
 
     /**
@@ -108,5 +119,18 @@ class ExpenseReportController extends Controller
         return view('expenseReport.confirmDelete',[
             'report' => $report
         ]);
+    }
+    
+    public function confirmSendMail($id){
+        $report = ExpenseReport::findOrFail($id);
+        return view('expenseReport.confirmSendMail',[
+            'report' => $report
+        ]);
+    }
+        
+    public function sendMail (Request $request,$id) {
+        $report = ExpenseReport::findOrFail($id);
+        Mail::to($request->get('email'))->send(new SummaryReport($report));
+        return redirect('/expense-reports/'.$id);
     }
 }
